@@ -1,0 +1,7 @@
+Flask==2.2.5
+Flask-OAuthlib==0.9.6
+Werkzeug==2.2.2
+Jinja2==3.0.1  
+markupsafe==2.1.5
+python-dotenv==1.0.1
+

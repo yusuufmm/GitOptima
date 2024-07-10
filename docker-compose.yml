@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=development
+      - SECRET_KEY=e04dd1970001db3760da3138758e92797930d1198709f86c
+      - GITHUB_CLIENT_ID=Ov23liH2rhL9yxUCTdiK
+      - GITHUB_CLIENT_SECRET=d84f65e7f5a53761fef95725ad9bc1ba4e8535ce
