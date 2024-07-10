@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, session
+from flask import Blueprint, redirect, url_for, session, request, jsonify
 from flask_oauthlib.client import OAuth
 import os
 
@@ -28,21 +28,30 @@ def login():
 
 @main.route('/logout')
 def logout():
-    session.pop('github_token')
+    session.pop('github_token', None)
+    session.pop('user', None)
     return redirect(url_for('.index'))
 
 @main.route('/login/authorized')
 def authorized():
     response = github.authorized_response()
     if response is None or response.get('access_token') is None:
-        return 'Access denied: reason={} error={}'.format(
-            request.args['error'], request.args['error_description']
-        )
+        error_reason = request.args.get('error', 'Unknown error')
+        error_description = request.args.get('error_description', 'No description provided')
+        return f'Access denied: reason={error_reason} error={error_description}'
+
     session['github_token'] = (response['access_token'], '')
     user_info = github.get('user')
-    return 'Logged in as: ' + user_info.data['login']
+
+    if user_info.data:
+        session['user'] = user_info.data
+        return redirect(url_for('.index'))
+    else:
+        return 'Failed to fetch user info from GitHub.'
 
 @github.tokengetter
 def get_github_oauth_token():
     return session.get('github_token')
+
+# Additional routes can be added here
 
