@@ -1,6 +1,10 @@
 from flask import Flask
 import os
 from flask_oauthlib.client import OAuth
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
 
 def create_app():
     """
@@ -20,6 +24,9 @@ def create_app():
 
     # Configure session to use filesystem (can also use 'redis', 'memcached', etc.)
     app.config['SESSION_TYPE'] = 'filesystem'
+
+    # Initialize the database
+    db.init_app(app)
 
     # Initialize OAuth
     oauth = OAuth(app)

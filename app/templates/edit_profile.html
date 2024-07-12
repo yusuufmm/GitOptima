@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <header role="banner">
+        <h1>{{ header_title }}</h1>
+    </header>
+    <nav role="navigation">
+        <ul>
+            <li><a href="{{ url_for('main.home') }}" class="{{ 'active' if request.endpoint == 'main.home' else '' }}">Home</a></li>
+            <li><a href="{{ url_for('main.profile') }}" class="{{ 'active' if request.endpoint == 'main.profile' else '' }}">Profile</a></li>
+            <li><a href="{{ url_for('main.edit_profile') }}" class="{{ 'active' if request.endpoint == 'main.edit_profile' else '' }}">Edit Profile</a></li>
+            <li><a href="{{ url_for('main.logout') }}" class="{{ 'active' if request.endpoint == 'main.logout' else '' }}">Logout</a></li>
+        </ul>
+    </nav>
+    <main role="main">
+        {% block content %}
+        <!-- Content will be injected here based on the specific page template that extends this base. -->
+        {% endblock %}
+    </main>
+    <footer role="contentinfo">
+        <p>&copy; {{ current_year }} Your Website. All rights reserved.</p>
+    </footer>
+</body>
+</html>

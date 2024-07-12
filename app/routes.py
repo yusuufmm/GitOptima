@@ -1,6 +1,13 @@
-from flask import Blueprint, redirect, url_for, session, request, jsonify
+from flask import Blueprint, redirect, url_for, session, request, flash, render_template
 from flask_oauthlib.client import OAuth
+from flask_wtf import FlaskForm
+from wtforms import StringField, EmailField
+from wtforms.validators import DataRequired, Email
+from flask import Blueprint
 import os
+
+from app import db, create_app  # Ensure 'app' is imported if used for logging
+from app.models import User
 
 main = Blueprint('main', __name__)
 oauth = OAuth()
@@ -53,5 +60,47 @@ def authorized():
 def get_github_oauth_token():
     return session.get('github_token')
 
-# Additional routes can be added here
+@main.route('/profile')
+def profile():
+    # Check if user is logged in
+    if 'user' not in session:
+        flash('Please log in to view your profile.', 'info')
+        return redirect(url_for('.login'))
 
+    # Fetch detailed user profile data from the database
+    try:
+        user_id = session['user']['id']
+        user = User.query.get(user_id)
+        if not user:
+            flash('User not found.', 'error')
+            return redirect(url_for('.login'))
+    except Exception as e:
+        flash('An error occurred while fetching user data.', 'error')
+        app.logger.error(f'Error fetching user data: {e}')
+        return redirect(url_for('.login'))
+
+    return render_template('profile.html', user=user)
+
+class EditProfileForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+
+@main.route('/profile/edit', methods=['GET', 'POST'])
+def edit_profile():
+    if 'user' not in session:
+        return redirect(url_for('.login'))
+
+    user_id = session['user']['id']
+    user = User.query.get(user_id)
+    form = EditProfileForm(obj=user)
+
+    if form.validate_on_submit():
+        user.name = form.name.data
+        user.email = form.email.data
+        db.session.commit()
+        session['user']['name'] = user.name
+        session['user']['email'] = user.email
+        flash('Profile updated successfully!')
+        return redirect(url_for('.profile'))
+
+    return render_template('edit_profile.html', form=form)
