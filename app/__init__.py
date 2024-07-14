@@ -2,6 +2,8 @@ from flask import Flask
 import os
 from flask_oauthlib.client import OAuth
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from .config import Config
 
 db = SQLAlchemy()
 
@@ -19,14 +21,17 @@ def create_app():
     # Set the secret key for session management
     app.secret_key = os.environ.get('SECRET_KEY')
 
-    # Load configuration from a separate config file
-    app.config.from_pyfile('config.py')
+    # Load configuration from config.py
+    app.config.from_object(Config)
 
     # Configure session to use filesystem (can also use 'redis', 'memcached', etc.)
     app.config['SESSION_TYPE'] = 'filesystem'
 
     # Initialize the database
     db.init_app(app)
+
+    # Initialize Flask-Migrate
+    migrate = Migrate(app, db)
 
     # Initialize OAuth
     oauth = OAuth(app)

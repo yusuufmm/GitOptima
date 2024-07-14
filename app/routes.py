@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, EmailField
 from wtforms.validators import DataRequired, Email
 from flask import Blueprint
+from .models import User
 import os
 
 from app import db, create_app  # Ensure 'app' is imported if used for logging
