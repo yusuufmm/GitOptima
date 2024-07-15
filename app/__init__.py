@@ -1,13 +1,12 @@
 from flask import Flask
-import os
+from .routes import main as main_blueprint
 from flask_oauthlib.client import OAuth
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from .config import Config
+from .extensions import db
+import os
 
-db = SQLAlchemy()
-
-
+# Ensure db is used appropriately within the application factory if necessary
 def create_app():
     """
     Create and configure the Flask application.
@@ -17,14 +16,13 @@ def create_app():
         app: The configured Flask application.
     """
     app = Flask(__name__)
-
     # Set the secret key for session management
     app.secret_key = os.environ.get('SECRET_KEY')
 
     # Load configuration from config.py
     app.config.from_object(Config)
 
-    # Configure session to use filesystem (can also use 'redis', 'memcached', etc.)
+    # Configure session to use filesystem
     app.config['SESSION_TYPE'] = 'filesystem'
 
     # Initialize the database
@@ -56,4 +54,3 @@ def create_app():
     app.register_blueprint(main)
 
     return app
-

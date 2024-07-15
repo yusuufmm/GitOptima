@@ -1,14 +1,17 @@
-from flask import Blueprint, redirect, url_for, session, request, flash, render_template
+from flask import (
+    Flask, session, flash, render_template, request, redirect,
+    url_for, current_app, jsonify, make_response, Blueprint
+)
 from flask_oauthlib.client import OAuth
 from flask_wtf import FlaskForm
-from wtforms import StringField, EmailField
+from wtforms import Form, StringField
 from wtforms.validators import DataRequired, Email
-from flask import Blueprint
-from .models import User
+from app.models import User
+from .extensions import db
 import os
 
-from app import db, create_app  # Ensure 'app' is imported if used for logging
-from app.models import User
+# Removed the problematic import
+from .models import User
 
 main = Blueprint('main', __name__)
 oauth = OAuth()
@@ -26,13 +29,24 @@ github = oauth.remote_app(
     authorize_url='https://github.com/login/oauth/authorize'
 )
 
-@main.route('/')
-def index():
-    return 'Welcome to GitOptima!'
 
+@main.route('/')
+@main.route('/home')
+def home():
+    return render_template('index.html')
+
+@main.route('/features')
+def features():
+    return render_template('features.html')
+
+
+@main.route('/get-started')
+def get_started():
+    return render_template('get_started.html')
 @main.route('/login')
 def login():
     return github.authorize(callback=url_for('.authorized', _external=True))
+
 
 @main.route('/logout')
 def logout():
@@ -40,13 +54,25 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('.index'))
 
+
+@main.route('/profile/view', endpoint='view_profile')
+def profile():
+    return render_template('profile.html')
+
+
 @main.route('/login/authorized')
 def authorized():
+
     response = github.authorized_response()
     if response is None or response.get('access_token') is None:
         error_reason = request.args.get('error', 'Unknown error')
-        error_description = request.args.get('error_description', 'No description provided')
-        return f'Access denied: reason={error_reason} error={error_description}'
+        error_description = request.args.get(
+           'error_description', 'No description provided'
+            )
+    return (
+        f'Access denied: reason={error_reason} '
+        f'error={error_description}'
+    )
 
     session['github_token'] = (response['access_token'], '')
     user_info = github.get('user')
@@ -57,9 +83,11 @@ def authorized():
     else:
         return 'Failed to fetch user info from GitHub.'
 
+
 @github.tokengetter
 def get_github_oauth_token():
     return session.get('github_token')
+
 
 @main.route('/profile')
 def profile():
@@ -77,14 +105,16 @@ def profile():
             return redirect(url_for('.login'))
     except Exception as e:
         flash('An error occurred while fetching user data.', 'error')
-        app.logger.error(f'Error fetching user data: {e}')
+        current_app.logger.error(f'Error fetching user data: {e}')
         return redirect(url_for('.login'))
 
     return render_template('profile.html', user=user)
 
+
 class EditProfileForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    email = EmailField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+
 
 @main.route('/profile/edit', methods=['GET', 'POST'])
 def edit_profile():

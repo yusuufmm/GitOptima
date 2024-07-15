@@ -8,12 +8,12 @@ services:
     volumes:
       - .:/app
     environment:
-      - FLASK_APP=app
-      - FLASK_ENV=development
-      - SECRET_KEY=${SECRET_KEY}
-      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-      - DATABASE_URL=${DATABASE_URL}
+      FLASK_APP: app
+      FLASK_ENV: development
+      SECRET_KEY: ${SECRET_KEY}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       - db
 
@@ -23,3 +23,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
