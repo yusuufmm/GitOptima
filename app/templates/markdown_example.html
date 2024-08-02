@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Example</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Markdown Example</h1>
+    </header>
+    <main>
+        <section>
+            {{ content|safe }}
+        </section>
+    </main>
+    <footer>
+        <p>&copy; {{ 2024 }} GitOptima. All rights reserved.</p>
+    </footer>
+</body>
+</html>

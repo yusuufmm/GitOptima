@@ -8,6 +8,7 @@ from wtforms import Form, StringField
 from wtforms.validators import DataRequired, Email
 from app.models import User
 from .extensions import db
+import markdown
 import os
 
 # Removed the problematic import
@@ -29,11 +30,35 @@ github = oauth.remote_app(
     authorize_url='https://github.com/login/oauth/authorize'
 )
 
-
 @main.route('/')
 @main.route('/home')
 def home():
     return render_template('index.html')
+
+
+@main.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+@main.route('/analytics')
+def analytics():
+    return render_template('features.html')
+
+
+@main.route('/markdown')
+def markdown_example():
+    md_content = """
+    # This is a heading
+    This is a paragraph with some **bold text** and *italic text*.
+    - Here is a list item
+    - Another list item
+    """
+
+    # Convert Markdown to HTML
+    html_content = Markup(markdown.markdown(md_content))
+
+    return render_template('markdown_example.html', content=html_content)
+
 
 @main.route('/features')
 def features():
