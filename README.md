@@ -1,5 +1,5 @@
+#GitOptima 🚀
 ![logo](https://github.com/yusuufmm/GitOptima/blob/main/sample.gif)
-# GitOptima 🚀
 
 **GitOptima** is a cutting-edge web service for visualizing and analyzing GitHub statistics. 🚀 It integrates seamlessly with the GitHub API to offer real-time insights 📊 into repository activity, user contributions, and performance metrics.
 
